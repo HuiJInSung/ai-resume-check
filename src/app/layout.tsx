@@ -16,7 +16,7 @@ const notoSerif = Noto_Serif_TC({
 
 export const metadata: Metadata = {
   title: "AI 履歷健檢",
-  description: "上傳履歷 PDF，AI 逐句指出問題並給你改法。專為行政、人事、都市更新、總務職缺設計。",
+  description: "上傳履歷 PDF，AI 逐句指出問題並給你改法。專為行政、人事、都市更新、總務、文書與業務助理等職缺設計。",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

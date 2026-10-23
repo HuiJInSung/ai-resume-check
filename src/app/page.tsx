@@ -13,6 +13,9 @@ const JOB_NOTES: Record<string, string> = {
   人事人員: "招募、薪資、勞健保與教育訓練",
   都市更新相關人員: "整合協調、法規程序與住戶溝通",
   總務人員: "採購、資產、庶務與廠商管理",
+  文件管理人員: "檔案歸檔、版本控管與文件系統",
+  文書人員: "公文收發、繕打校對與檔案整理",
+  業務助理: "報價訂單、客戶聯繫與業績報表",
 };
 
 export default function Home() {
@@ -26,7 +29,7 @@ export default function Home() {
           <div className="animate-rise">
             <p className="mb-5 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs text-muted">
               <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              專為行政・人事・都更・總務職缺設計
+              專為行政・人事・都更・總務・文書・業助職缺設計
             </p>
             <h1 className="font-serif text-4xl font-bold leading-[1.25] tracking-tight text-ink sm:text-5xl lg:text-6xl">
               讓履歷上的

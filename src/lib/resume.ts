@@ -5,6 +5,9 @@ export const JOB_TYPES = [
   "人事人員",
   "都市更新相關人員",
   "總務人員",
+  "文件管理人員",
+  "文書人員",
+  "業務助理",
 ] as const;
 
 export type JobType = (typeof JOB_TYPES)[number];

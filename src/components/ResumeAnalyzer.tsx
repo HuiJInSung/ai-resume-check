@@ -2,20 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { StepBadge, useApiKey } from "@/components/ApiKeyInput";
+import DownloadPdfButton from "@/components/ReportPdf";
+import { SEVERITY_STYLE, ScoreRing } from "@/components/report-ui";
 import {
   CATEGORIES,
   JOB_TYPES,
   MAX_PDF_BYTES,
   type AnalysisResult,
   type AnalyzeResponse,
-  type Severity,
 } from "@/lib/resume";
-
-const SEVERITY_STYLE: Record<Severity, { label: string; className: string }> = {
-  high: { label: "優先修改", className: "bg-accent-soft text-accent" },
-  medium: { label: "建議修改", className: "bg-warn-soft text-warn" },
-  low: { label: "可再加強", className: "bg-paper text-muted border border-line" },
-};
 
 function formatSize(bytes: number) {
   return bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / 1024 / 1024).toFixed(1)} MB`;
@@ -28,6 +23,8 @@ export default function ResumeAnalyzer() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [result, setResult] = useState<AnalysisResult | null>(null);
+  // 記住這份報告當時用的職缺與檔名，之後切換選項不影響已產生的報告
+  const [analyzed, setAnalyzed] = useState({ jobType: "", fileName: "" });
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,8 +61,10 @@ export default function ResumeAnalyzer() {
         body,
       });
       const data: AnalyzeResponse = await res.json();
-      if (data.ok) setResult(data.result);
-      else setError(data.error);
+      if (data.ok) {
+        setAnalyzed({ jobType, fileName: file.name });
+        setResult(data.result);
+      } else setError(data.error);
     } catch {
       setError("連線失敗，請稍後再試");
     } finally {
@@ -169,7 +168,7 @@ export default function ResumeAnalyzer() {
       {loading && <LoadingCard />}
 
       <div ref={resultRef} className="scroll-mt-20">
-        {result && <AnalysisView result={result} jobType={jobType} />}
+        {result && <AnalysisView result={result} jobType={analyzed.jobType} fileName={analyzed.fileName} />}
       </div>
     </>
   );
@@ -189,43 +188,25 @@ function LoadingCard() {
   );
 }
 
-function ScoreRing({ score }: { score: number }) {
-  const r = 42;
-  const c = 2 * Math.PI * r;
-  const color = score >= 80 ? "text-good" : score >= 60 ? "text-warn" : "text-accent";
-  return (
-    <div className="relative h-28 w-28 shrink-0">
-      <svg viewBox="0 0 100 100" className="h-full w-full -rotate-90">
-        <circle cx="50" cy="50" r={r} fill="none" strokeWidth="8" className="stroke-line" />
-        <circle
-          cx="50"
-          cy="50"
-          r={r}
-          fill="none"
-          strokeWidth="8"
-          strokeLinecap="round"
-          stroke="currentColor"
-          strokeDasharray={c}
-          strokeDashoffset={c * (1 - score / 100)}
-          className={`${color} transition-[stroke-dashoffset] duration-1000`}
-        />
-      </svg>
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="font-serif text-3xl font-bold leading-none text-ink">{score}</span>
-        <span className="mt-1 text-[11px] text-muted">/ 100</span>
-      </div>
-    </div>
-  );
-}
-
-function AnalysisView({ result, jobType }: { result: AnalysisResult; jobType: string }) {
+function AnalysisView({
+  result,
+  jobType,
+  fileName,
+}: {
+  result: AnalysisResult;
+  jobType: string;
+  fileName: string;
+}) {
   const total = result.categories.reduce((n, c) => n + c.suggestions.length, 0);
 
   return (
     <section className="animate-rise flex w-full flex-col gap-5 pt-6">
-      <div>
-        <p className="text-xs font-medium tracking-[0.25em] text-accent">REPORT</p>
-        <h2 className="mt-2 font-serif text-2xl font-bold text-ink sm:text-3xl">健檢報告</h2>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="text-xs font-medium tracking-[0.25em] text-accent">REPORT</p>
+          <h2 className="mt-2 font-serif text-2xl font-bold text-ink sm:text-3xl">健檢報告</h2>
+        </div>
+        <DownloadPdfButton result={result} jobType={jobType} fileName={fileName} />
       </div>
 
       <div className="flex flex-col items-center gap-6 rounded-3xl bg-ink p-6 text-paper sm:flex-row sm:items-center sm:p-8">

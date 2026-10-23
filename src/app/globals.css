@@ -1,6 +1,8 @@
 @import "tailwindcss";
 
-:root {
+/* .pdf-light：匯出 PDF 時強制使用淺色 */
+:root,
+.pdf-light {
   --paper: #f6f3ec;
   --surface: #fffdf8;
   --ink: #1d1c1a;
